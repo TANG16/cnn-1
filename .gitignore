@@ -35,3 +35,5 @@ training_set/
 *.pdf
 *.doc
 *.docx
+
+ignor/
