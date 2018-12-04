@@ -43,17 +43,24 @@ opts.decorr = 0.0;
 %% Initialization
 for i = 2:length(NN.struct)
     if(strcmp(NN.ltype{i},'c') || strcmp(NN.ltype{i},'dc'))		%convolutional/deconvolutional layer
-
-	
-	
+        numFilters2 = layer.numFilters;
+        filterDim = layer.filterDim;
+        layer.W = 1e-1*randn(filterDim,filterDim,numFilters1,numFilters2);
+        layer.b = zeros(numFilters2,1);
+        layer.W_velocity = zeros(size(layer.W));
+        layer.b_velocity = zeros(size(layer.b));      
+        convDim = LastOutDim - layer.filterDim + 1;
+        layer.delta = zeros(convDim,convDim,numFilters2,opts.batchsize);
+        numFilters1 = numFilters2;
+        LastOutDim = convDim;	
 	elseif(strcmp(NN.ltype{i},'p') || strcmp(NN.ltype{i},'dp'))	%pooling/un-pooling layer
-	
-	
-	
+        pooledDim = LastOutDim / layer.poolDim;
+        layer.delta = zeros(pooledDim,pooledDim,numFilters1,opts.batchsize);
+        LastOutDim = pooledDim;		
 	else 														%fully connected layer
-    eps_initt = sqrt(6)/sqrt((NN.struct{i} + NN.struct{i-1}));
-    NN.W{i-1} = randn(NN.struct{i}, NN.struct{i-1}) * eps_initt;
-    NN.B{i-1} = zeros(NN.struct{i},1);
+		eps_initt = sqrt(6)/sqrt((NN.struct{i} + NN.struct{i-1}));
+		NN.W{i-1} = randn(NN.struct{i}, NN.struct{i-1}) * eps_initt;
+		NN.B{i-1} = zeros(NN.struct{i},1);
 	end
 end
 
